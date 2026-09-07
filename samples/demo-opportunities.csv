@@ -1,0 +1,16 @@
+rank,marketplace,sku,query,category,title,price_rub,rating,reviews,opportunity_score,demand_score,momentum_score,competition_index,margin_percent,risk_level,trend_stage,url
+1,yandex_market,YM-10120,органайзер для кабелей,Home organization,"Модульный органайзер для кабелей, набор 20 штук",861,4.9,1798,82.67,89.49,94.08,41.05,31.05,low,breakout,https://example.com/yandex_market/10120
+2,wildberries,WB-10100,органайзер для кабелей,Home organization,"Модульный органайзер для кабелей, набор 20 штук",743,4.9,3316,82.3,93.63,94.06,50.45,29.95,low,breakout,https://example.com/wildberries/10100
+3,ozon,OZ-10110,органайзер для кабелей,Home organization,"Модульный органайзер для кабелей, набор 20 штук",822,4.9,2585,81.55,91.81,94.07,44.4,27.99,low,breakout,https://example.com/ozon/10110
+4,yandex_market,YM-10020,беспроводной мини пылесос,Home appliances,Беспроводной мини-пылесос для дома и автомобиля,2714,4.8,934,80.91,87.16,95.24,35.33,27.01,low,breakout,https://example.com/yandex_market/10020
+5,wildberries,WB-10000,беспроводной мини пылесос,Home appliances,Беспроводной мини-пылесос для дома и автомобиля,2341,4.8,1723,80.71,90.79,95.21,42.45,25.99,low,breakout,https://example.com/wildberries/10000
+6,ozon,OZ-10010,беспроводной мини пылесос,Home appliances,Беспроводной мини-пылесос для дома и автомобиля,2590,4.8,1343,79.8,89.48,95.2,38.68,24,low,rising,https://example.com/ozon/10010
+7,yandex_market,YM-10220,лампа закат,Lighting,Проекционная лампа закат с RGB и управлением,1515,4.7,570,75.71,81.78,96.13,46.05,23.02,low,rising,https://example.com/yandex_market/10220
+8,wildberries,WB-10200,лампа закат,Lighting,Проекционная лампа закат с RGB и управлением,1307,4.7,1050,74.44,85.92,96.05,62.28,22.03,low,rising,https://example.com/wildberries/10200
+9,ozon,OZ-10210,лампа закат,Lighting,Проекционная лампа закат с RGB и управлением,1446,4.7,819,74.18,84.1,96.05,52.43,20.01,low,rising,https://example.com/ozon/10210
+10,wildberries,WB-10300,термопринтер наклеек,Office electronics,Карманный термопринтер этикеток Bluetooth,3093,4.8,873,73.77,87.07,93.74,38.94,14,low,rising,https://example.com/wildberries/10300
+11,yandex_market,YM-10320,термопринтер наклеек,Office electronics,Карманный термопринтер этикеток Bluetooth,3586,4.8,474,73.46,82.93,92.78,32.59,15,low,rising,https://example.com/yandex_market/10320
+12,yandex_market,YM-10420,дорожная косметичка,Travel accessories,Дорожная косметичка-трансформер с подвесом,1297,4.6,1229,72.71,80.44,73.28,52.1,29.01,low,rising,https://example.com/yandex_market/10420
+13,ozon,OZ-10310,термопринтер наклеек,Office electronics,Карманный термопринтер этикеток Bluetooth,3422,4.8,681,72.68,85.25,93.75,35.17,12.01,low,rising,https://example.com/ozon/10310
+14,wildberries,WB-10400,дорожная косметичка,Travel accessories,Дорожная косметичка-трансформер с подвесом,1119,4.6,2266,71.77,84.58,76.1,69.85,27.96,low,rising,https://example.com/wildberries/10400
+15,ozon,OZ-10410,дорожная косметичка,Travel accessories,Дорожная косметичка-трансформер с подвесом,1238,4.6,1766,71.34,82.76,74.53,59.24,26,low,rising,https://example.com/ozon/10410

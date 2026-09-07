@@ -1,0 +1,42 @@
+{
+  "success": true,
+  "generated_at": "2026-09-06T20:32:31.316Z",
+  "overall_status": "healthy",
+  "latest_snapshot_at": "2026-09-06T20:32:31.311Z",
+  "snapshot_age_hours": 0,
+  "source_health": [
+    {
+      "source": "wildberries",
+      "requests": 5,
+      "successful_requests": 5,
+      "failed_requests": 0,
+      "records": 10,
+      "health": "healthy"
+    },
+    {
+      "source": "ozon",
+      "requests": 5,
+      "successful_requests": 5,
+      "failed_requests": 0,
+      "records": 10,
+      "health": "healthy"
+    },
+    {
+      "source": "yandex_market",
+      "requests": 5,
+      "successful_requests": 5,
+      "failed_requests": 0,
+      "records": 10,
+      "health": "healthy"
+    }
+  ],
+  "retained_runs": 1,
+  "historical_products": 0,
+  "recent_error_count": 1,
+  "latest_error": {
+    "occurred_at": "2026-09-06T20:32:31.316Z",
+    "last_node": "Demo Node",
+    "error_name": "FixtureError",
+    "error_message": "Synthetic failure used by repository tests"
+  }
+}

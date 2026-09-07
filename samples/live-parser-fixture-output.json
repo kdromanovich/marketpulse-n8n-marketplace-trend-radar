@@ -1,0 +1,261 @@
+{
+  "context": {
+    "trigger_type": "manual",
+    "requested_at": "2026-09-06T20:32:31.300Z",
+    "request_meta": {},
+    "config": {
+      "workflow_version": "1.1.0",
+      "demo_mode": false,
+      "locale": "ru-RU",
+      "currency": "RUB",
+      "queries": [
+        "беспроводной мини пылесос",
+        "органайзер для кабелей",
+        "лампа закат",
+        "термопринтер наклеек",
+        "дорожная косметичка"
+      ],
+      "sources": [
+        "wildberries",
+        "ozon",
+        "yandex_market"
+      ],
+      "collection": {
+        "max_results_per_query": 20,
+        "request_timeout_ms": 25000,
+        "request_batch_size": 1,
+        "request_batch_interval_ms": 1200,
+        "user_agent": "MarketPulseBot/1.1 (+https://github.com/kdromanovich/marketpulse-n8n-marketplace-trend-radar)",
+        "destination_id": "DEMO_WB_DESTINATION_ID"
+      },
+      "quality": {
+        "min_price": 150,
+        "max_price": 150000,
+        "min_title_length": 8,
+        "stale_after_hours": 30
+      },
+      "economics": {
+        "default_purchase_cost_ratio": 0.38,
+        "commission_rate": {
+          "wildberries": 0.17,
+          "ozon": 0.18,
+          "yandex_market": 0.16
+        },
+        "logistics_rate": {
+          "wildberries": 0.08,
+          "ozon": 0.09,
+          "yandex_market": 0.08
+        },
+        "advertising_rate": 0.08,
+        "return_loss_rate": 0.04,
+        "tax_rate": 0.06,
+        "target_margin_percent": 22
+      },
+      "scoring": {
+        "opportunity_weights": {
+          "demand": 0.36,
+          "momentum": 0.2,
+          "economics": 0.22,
+          "low_competition": 0.14,
+          "data_quality": 0.08
+        },
+        "breakout_threshold": 80,
+        "rising_threshold": 68,
+        "watch_threshold": 52
+      },
+      "risk": {
+        "prohibited_terms": [
+          "реплика",
+          "копия бренда",
+          "18+",
+          "лекарственный",
+          "табачный"
+        ],
+        "fragile_terms": [
+          "стекло",
+          "керамика",
+          "зеркало"
+        ],
+        "certification_terms": [
+          "детский",
+          "зарядное устройство",
+          "косметика",
+          "массажер"
+        ]
+      },
+      "integrations": {
+        "enabled": false,
+        "telegram_api_url": "https://api.telegram.org/bot<SET_TOKEN>/sendMessage",
+        "telegram_chat_id": "<SET_CHAT_ID>",
+        "slack_webhook_url": "https://hooks.slack.com/services/SET/ME",
+        "warehouse_webhook_url": "https://example.invalid/marketpulse/upsert"
+      }
+    },
+    "run_id": "mpr_mtq9q2it_u4gwhl",
+    "validated_at": "2026-09-06T20:32:31.301Z",
+    "expected_requests": 15
+  },
+  "collection_mode": "live",
+  "raw_products": [
+    {
+      "raw_source": "wildberries",
+      "marketplace": "wildberries",
+      "query": "беспроводной мини пылесос",
+      "category": null,
+      "sku": "11001",
+      "title": "Demo vacuum",
+      "brand": null,
+      "seller_name": null,
+      "price": 2490,
+      "old_price": 3190,
+      "currency": "RUB",
+      "rating": 4.8,
+      "reviews_count": 120,
+      "seller_count": 1,
+      "current_rank": 1,
+      "sales_30d_proxy": 120,
+      "delivery_days": 0,
+      "in_stock": true,
+      "sponsored": false,
+      "url": "https://www.wildberries.ru/catalog/11001/detail.aspx",
+      "image_url": null,
+      "captured_at": "2026-09-06T20:32:31.315Z",
+      "raw_payload": {
+        "id": 11001,
+        "name": "Demo vacuum",
+        "salePriceU": 249000,
+        "priceU": 319000,
+        "reviewRating": 4.8,
+        "feedbacks": 120,
+        "totalQuantity": 20
+      }
+    },
+    {
+      "raw_source": "ozon",
+      "marketplace": "ozon",
+      "query": "беспроводной мини пылесос",
+      "category": null,
+      "sku": "OZ-22001",
+      "title": "Demo organizer",
+      "brand": null,
+      "seller_name": null,
+      "price": 890,
+      "old_price": 1090,
+      "currency": "RUB",
+      "rating": 4.7,
+      "reviews_count": 85,
+      "seller_count": 1,
+      "current_rank": 1,
+      "sales_30d_proxy": 85,
+      "delivery_days": 0,
+      "in_stock": true,
+      "sponsored": false,
+      "url": "https://www.ozon.ru/search/?text=%D0%B1%D0%B5%D1%81%D0%BF%D1%80%D0%BE%D0%B2%D0%BE%D0%B4%D0%BD%D0%BE%D0%B9%20%D0%BC%D0%B8%D0%BD%D0%B8%20%D0%BF%D1%8B%D0%BB%D0%B5%D1%81%D0%BE%D1%81",
+      "image_url": null,
+      "captured_at": "2026-09-06T20:32:31.315Z",
+      "raw_payload": {
+        "sku": "OZ-22001",
+        "title": "Demo organizer",
+        "price": 890,
+        "originalPrice": 1090,
+        "rating": 4.7,
+        "reviewsCount": 85,
+        "available": true
+      }
+    },
+    {
+      "raw_source": "yandex_market",
+      "marketplace": "yandex_market",
+      "query": "беспроводной мини пылесос",
+      "category": null,
+      "sku": "YM-33001",
+      "title": "Demo lamp",
+      "brand": null,
+      "seller_name": null,
+      "price": 1490,
+      "old_price": 1490,
+      "currency": "RUB",
+      "rating": 4.6,
+      "reviews_count": 64,
+      "seller_count": 1,
+      "current_rank": 1,
+      "sales_30d_proxy": 64,
+      "delivery_days": 0,
+      "in_stock": true,
+      "sponsored": false,
+      "url": "https://market.yandex.ru/search?text=%D0%B1%D0%B5%D1%81%D0%BF%D1%80%D0%BE%D0%B2%D0%BE%D0%B4%D0%BD%D0%BE%D0%B9%20%D0%BC%D0%B8%D0%BD%D0%B8%20%D0%BF%D1%8B%D0%BB%D0%B5%D1%81%D0%BE%D1%81",
+      "image_url": null,
+      "captured_at": "2026-09-06T20:32:31.315Z",
+      "raw_payload": {
+        "sku": "YM-33001",
+        "name": "Demo lamp",
+        "offers": {
+          "price": "1490",
+          "priceCurrency": "RUB"
+        },
+        "aggregateRating": {
+          "ratingValue": "4.6",
+          "reviewCount": "64"
+        }
+      }
+    }
+  ],
+  "source_health": [
+    {
+      "source": "wildberries",
+      "requests": 1,
+      "successful_requests": 1,
+      "failed_requests": 0,
+      "records": 1,
+      "health": "healthy"
+    },
+    {
+      "source": "ozon",
+      "requests": 1,
+      "successful_requests": 1,
+      "failed_requests": 0,
+      "records": 1,
+      "health": "healthy"
+    },
+    {
+      "source": "yandex_market",
+      "requests": 1,
+      "successful_requests": 1,
+      "failed_requests": 0,
+      "records": 1,
+      "health": "healthy"
+    }
+  ],
+  "request_log": [
+    {
+      "request_id": "mpr_mtq9q2it_u4gwhl_req_001",
+      "source": "wildberries",
+      "query": "беспроводной мини пылесос",
+      "status_code": 200,
+      "duration_ms": 1,
+      "records": 1,
+      "successful": true,
+      "error": null
+    },
+    {
+      "request_id": "mpr_mtq9q2it_u4gwhl_req_002",
+      "source": "ozon",
+      "query": "беспроводной мини пылесос",
+      "status_code": 200,
+      "duration_ms": 1,
+      "records": 1,
+      "successful": true,
+      "error": null
+    },
+    {
+      "request_id": "mpr_mtq9q2it_u4gwhl_req_003",
+      "source": "yandex_market",
+      "query": "беспроводной мини пылесос",
+      "status_code": 200,
+      "duration_ms": 1,
+      "records": 1,
+      "successful": true,
+      "error": null
+    }
+  ]
+}

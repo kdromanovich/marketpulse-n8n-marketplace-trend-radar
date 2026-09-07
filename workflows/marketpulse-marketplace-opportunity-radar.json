@@ -1,0 +1,2035 @@
+{
+  "name": "MarketPulse | Multi-Marketplace Product Opportunity Radar",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## MarketPulse — Marketplace Trend Radar\n\nA product intelligence pipeline for **Wildberries, Ozon, and Yandex Market**. It collects search results, normalizes incompatible payloads, compares products with historical snapshots, estimates unit economics, detects risk, and publishes a ranked opportunity radar.\n\nManual execution runs a deterministic demo without external services.",
+        "height": 400,
+        "width": 680,
+        "color": 4
+      },
+      "id": "095381bb-bf69-5532-a008-e330851a5b64",
+      "name": "Note · Project Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2432,
+        -816
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## One-click demonstration\n\n1. Import the JSON into n8n.\n2. Open **Trigger · Run Demo**.\n3. Click **Execute Workflow**.\n4. Inspect **Report · Build Executive Opportunity Radar**, **Export · Render Markdown Digest**, and **State · Stage Latest Radar Snapshot**.\n\nThe demo generates 30 realistic offers and deliberately includes winners, crowded niches, and risky products so every scoring branch is visible. To persist the demo for the read-only APIs, activate the workflow and call the POST scan endpoint with `{ \"demo_mode\": true }`.",
+        "height": 400,
+        "width": 620,
+        "color": 7
+      },
+      "id": "b49329ea-db19-5a25-b741-15e4ab78bdc0",
+      "name": "Note · One-Click Demo",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1712,
+        -816
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Live setup\n\n- The schedule and POST webhook use live mode.\n- Edit queries, thresholds, fees, and source URLs in **Config · Build Runtime Policy**.\n- Add Header Auth credentials to both API webhooks.\n- Replace the Telegram, Slack, and warehouse placeholders before enabling delivery.\n- Activate only after testing the marketplace responses in your region.\n\nMarketplace storefront structures change; adapters are intentionally isolated for quick maintenance.",
+        "height": 400,
+        "width": 700,
+        "color": 5
+      },
+      "id": "8130f039-4db1-57ef-8181-66caf6e464c6",
+      "name": "Note · Live Mode Setup",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1056,
+        -816
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Responsible collection\n\nThe HTTP node uses a small batch size, delay, retries, timeout, and a transparent user agent. Keep request volume low, cache results, and follow each marketplace's terms and robots rules. For commercial scale, replace storefront parsing with licensed feeds, seller APIs, or an approved data provider.\n\nNo proxy rotation, CAPTCHA bypass, or anti-bot evasion is included.",
+        "height": 400,
+        "width": 700,
+        "color": 6
+      },
+      "id": "4e9440b3-e3ce-5642-b623-3ec094e064f3",
+      "name": "Note · Responsible Collection Policy",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        -816
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 1 — Collection control plane\n\nThree triggers share one validated configuration. Demo data and live HTTP collection converge into the same source contract. Live requests are generated as a query × marketplace matrix and parsed with source-aware extractors.",
+        "height": 760,
+        "width": 1120,
+        "color": 3
+      },
+      "id": "c5ae878d-09eb-59d5-94c9-4a4fa852e615",
+      "name": "Zone · Collection",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1472,
+        -288
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 2 — Data contracts and quality\n\nSource-specific adapters map incompatible fields into one canonical product model. The pipeline cleans taxonomy, rejects malformed records, removes duplicates, attaches the previous observation, and engineers comparable commercial features.",
+        "height": 760,
+        "width": 1900,
+        "color": 2
+      },
+      "id": "54c8d167-bf73-5eea-9a77-1c2d0dbafef6",
+      "name": "Zone · Normalization",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -256,
+        -288
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 3 — Parallel scoring engines\n\nDemand, competitive pressure, unit economics, and risk are calculated independently and merged by product key. This makes every model testable and replaceable without rewriting the rest of the workflow.",
+        "height": 1040,
+        "width": 1160,
+        "color": 5
+      },
+      "id": "15b6e4a7-eb40-5199-b18e-0cb09e0dff15",
+      "name": "Zone · Explainable Scoring",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1728,
+        -384
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 4 — Decision intelligence\n\nThe scored catalog becomes four business views: ranked opportunities, category map, cross-market price gaps, and a diversified shortlist. The views are merged into an executive radar with explainable recommendations.",
+        "height": 1040,
+        "width": 1160,
+        "color": 4
+      },
+      "id": "eb54229c-47ac-5f87-aab5-00b52736bc4b",
+      "name": "Zone · Insight Products",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2976,
+        -384
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 5 — Persistence, exports, and delivery\n\nEvery run produces Markdown, CSV, and JSON. The latest radar and live baselines are stored in workflow static data. Optional delivery fans out to Telegram, Slack, and a warehouse webhook. POST scans receive a synchronous response; scheduled and manual runs finish without calling a webhook response node.",
+        "height": 960,
+        "width": 2560,
+        "color": 7
+      },
+      "id": "8eae761b-2806-5e6a-a7e9-43a163794e40",
+      "name": "Zone · Delivery",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        4208,
+        -288
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Read-only API surface\n\nThese endpoints are intentionally separate trigger branches inside the same workflow:\n\n- `GET /marketpulse-opportunities` returns the latest ranked radar.\n- `GET /marketpulse-health` returns freshness, source health, and recent failures.\n- `POST /marketpulse-failure-intake` accepts protected failure events for the failure log.\n\nThey read or update shared workflow state and must not be connected to the scheduled execution chain.",
+        "height": 780,
+        "width": 980,
+        "color": 3
+      },
+      "id": "703339fc-18e2-5927-979f-24209110c45e",
+      "name": "Zone · Read APIs and Observability",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2432,
+        848
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "d33b75f3-d598-5dc8-bd3d-01888569832d",
+      "name": "Trigger · Run Demo",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2400,
+        -128
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: {\n  trigger_type: 'manual',\n  demo_mode: true,\n  requested_at: new Date().toISOString(),\n  request_payload: {}\n} }];"
+      },
+      "id": "6e801891-2014-52ad-b264-f5acaa805615",
+      "name": "Context · Manual Demo Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2160,
+        -128
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8 * * *"
+            }
+          ]
+        }
+      },
+      "id": "a98f38f2-69b0-5444-b2b2-5b8756598a72",
+      "name": "Trigger · Daily Scan at 08:00 MSK",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -2400,
+        64
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: {\n  trigger_type: 'schedule',\n  demo_mode: false,\n  requested_at: new Date().toISOString(),\n  request_payload: {}\n} }];"
+      },
+      "id": "52e1cc91-d093-5ae4-9bbc-8f926dc369f0",
+      "name": "Context · Scheduled Scan Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2160,
+        64
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "marketpulse-scan",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "602c0988-4044-5044-a732-365b8a9bcc86",
+      "name": "Trigger · On-Demand Scan API",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -2400,
+        256
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $json.body && typeof $json.body === 'object' && !Array.isArray($json.body) ? $json.body : {};\nconst clip = (value, limit) => String(value ?? '').replace(/[\\u0000-\\u001F]/g, ' ').trim().slice(0, limit);\nreturn [{ json: {\n  trigger_type: 'api',\n  demo_mode: body.demo_mode === true,\n  requested_at: new Date().toISOString(),\n  request_payload: body,\n  request_meta: {\n    request_id: clip($json.headers?.['x-request-id'], 120) || null,\n    caller: clip($json.headers?.['x-client-name'] || 'api-client', 120)\n  }\n} }];"
+      },
+      "id": "7b7084e3-a557-5ba6-af4f-8905948e7b3e",
+      "name": "Context · API Scan Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2160,
+        256
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const request = $json.request_payload || {};\nconst defaultQueries = [\n  'беспроводной мини пылесос',\n  'органайзер для кабелей',\n  'лампа закат',\n  'термопринтер наклеек',\n  'дорожная косметичка'\n];\nconst allowedSources = ['wildberries', 'ozon', 'yandex_market'];\nconst requestedQueries = Array.isArray(request.queries) ? request.queries : defaultQueries;\nconst queries = [...new Set(requestedQueries.map(v => String(v).trim()).filter(Boolean))].slice(0, 10);\nconst requestedSources = Array.isArray(request.sources) ? request.sources : allowedSources;\nconst sources = [...new Set(requestedSources.map(v => String(v).toLowerCase()))].filter(v => allowedSources.includes(v));\n\nconst readRuntimeValue = name => {\n  try {\n    const fromEnvironment = $env?.[name];\n    if (fromEnvironment !== undefined && String(fromEnvironment).trim()) return String(fromEnvironment).trim();\n  } catch {}\n  try {\n    const fromVariables = $vars?.[name];\n    if (fromVariables !== undefined && String(fromVariables).trim()) return String(fromVariables).trim();\n  } catch {}\n  return '';\n};\nconst deliveryEnabled = /^(1|true|yes|on)$/i.test(readRuntimeValue('MARKETPULSE_ENABLE_DELIVERY'));\n\nconst config = {\n  workflow_version: '1.1.0',\n  demo_mode: Boolean($json.demo_mode),\n  locale: 'ru-RU',\n  currency: 'RUB',\n  queries,\n  sources,\n  collection: {\n    max_results_per_query: Math.min(Math.max(Number(request.max_results_per_query || 20), 5), 50),\n    request_timeout_ms: 25000,\n    request_batch_size: 1,\n    request_batch_interval_ms: 1200,\n    user_agent: 'MarketPulseBot/1.1 (+https://github.com/kdromanovich/marketpulse-n8n-marketplace-trend-radar)',\n    destination_id: readRuntimeValue('MARKETPULSE_WB_DESTINATION_ID') || '<SET_WB_DESTINATION_ID>'\n  },\n  quality: {\n    min_price: 150,\n    max_price: 150000,\n    min_title_length: 8,\n    stale_after_hours: 30\n  },\n  economics: {\n    default_purchase_cost_ratio: 0.38,\n    commission_rate: { wildberries: 0.17, ozon: 0.18, yandex_market: 0.16 },\n    logistics_rate: { wildberries: 0.08, ozon: 0.09, yandex_market: 0.08 },\n    advertising_rate: 0.08,\n    return_loss_rate: 0.04,\n    tax_rate: 0.06,\n    target_margin_percent: 22\n  },\n  scoring: {\n    opportunity_weights: { demand: 0.36, momentum: 0.20, economics: 0.22, low_competition: 0.14, data_quality: 0.08 },\n    breakout_threshold: 80,\n    rising_threshold: 68,\n    watch_threshold: 52\n  },\n  risk: {\n    prohibited_terms: ['реплика', 'копия бренда', '18+', 'лекарственный', 'табачный'],\n    fragile_terms: ['стекло', 'керамика', 'зеркало'],\n    certification_terms: ['детский', 'зарядное устройство', 'косметика', 'массажер']\n  },\n  integrations: {\n    enabled: deliveryEnabled,\n    telegram_api_url: readRuntimeValue('MARKETPULSE_TELEGRAM_API_URL') || 'https://api.telegram.org/bot<SET_TOKEN>/sendMessage',\n    telegram_chat_id: readRuntimeValue('MARKETPULSE_TELEGRAM_CHAT_ID') || '<SET_CHAT_ID>',\n    slack_webhook_url: readRuntimeValue('MARKETPULSE_SLACK_WEBHOOK_URL') || 'https://hooks.slack.com/services/SET/ME',\n    warehouse_webhook_url: readRuntimeValue('MARKETPULSE_WAREHOUSE_WEBHOOK_URL') || 'https://example.invalid/marketpulse/upsert'\n  }\n};\n\nreturn [{ json: {\n  context: {\n    trigger_type: $json.trigger_type,\n    requested_at: $json.requested_at,\n    request_meta: $json.request_meta || {},\n    config\n  }\n} }];"
+      },
+      "id": "de3681e1-8596-57d4-92c5-494b75354fb7",
+      "name": "Config · Build Runtime Policy",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1888,
+        64
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $json;\nconst config = data.context?.config;\nif (!config) throw new Error('MarketPulse configuration is missing');\nif (!config.queries.length) throw new Error('At least one search query is required');\nif (!config.sources.length) throw new Error('At least one marketplace source is required');\nconst unsafe = config.queries.filter(q => q.length > 120 || /[<>\\u0000-\\u001F]/.test(q));\nif (unsafe.length) throw new Error('Unsafe or oversized queries: ' + unsafe.join(', '));\nconst weightTotal = Object.values(config.scoring.opportunity_weights).reduce((sum, value) => sum + Number(value), 0);\nif (Math.abs(weightTotal - 1) > 0.001) throw new Error('Opportunity scoring weights must total 1.0');\nif (config.integrations.enabled) {\n  const endpoints = {\n    telegram_api_url: config.integrations.telegram_api_url,\n    slack_webhook_url: config.integrations.slack_webhook_url,\n    warehouse_webhook_url: config.integrations.warehouse_webhook_url\n  };\n  const invalidEndpoints = Object.entries(endpoints)\n    .filter(([, value]) => {\n      const normalized = String(value);\n      return !normalized.toLowerCase().startsWith('https://') || normalized.includes('<') || normalized.includes('SET/ME') || normalized.includes('example.invalid');\n    })\n    .map(([name]) => name);\n  if (!config.integrations.telegram_chat_id || /<SET_CHAT_ID>/i.test(config.integrations.telegram_chat_id)) invalidEndpoints.push('telegram_chat_id');\n  if (invalidEndpoints.length) throw new Error('External delivery is enabled but runtime configuration is incomplete: ' + [...new Set(invalidEndpoints)].join(', '));\n}\nconst runId = 'mpr_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);\nreturn [{ json: {\n  ...data,\n  context: {\n    ...data.context,\n    run_id: runId,\n    validated_at: new Date().toISOString(),\n    expected_requests: config.queries.length * config.sources.length\n  },\n  validation: {\n    valid: true,\n    query_count: config.queries.length,\n    source_count: config.sources.length,\n    expected_requests: config.queries.length * config.sources.length\n  }\n} }];"
+      },
+      "id": "2bae652a-8563-50e0-b38d-9d1cf1f727a9",
+      "name": "Config · Validate Scan Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1648,
+        64
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "860f6d12-f58e-5e86-a320-b835eaaaccce",
+              "leftValue": "={{ $json.context.config.demo_mode }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "d442b1ef-b6b1-5a6e-999f-dc79cd760549",
+      "name": "Route · Demo or Live Collection",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1408,
+        64
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const context = $json.context;\nconst templates = [\n  { query: 'беспроводной мини пылесос', category: 'Home appliances', title: 'Беспроводной мини-пылесос для дома и автомобиля', price: 2490, rank: 4, previousRank: 19, rating: 4.8, reviews: 1460, previousReviews: 1170, sales: 920, previousSales: 610, sellers: 12, costRatio: 0.31, delivery: 2 },\n  { query: 'органайзер для кабелей', category: 'Home organization', title: 'Модульный органайзер для кабелей, набор 20 штук', price: 790, rank: 7, previousRank: 28, rating: 4.9, reviews: 2810, previousReviews: 2440, sales: 1380, previousSales: 940, sellers: 18, costRatio: 0.27, delivery: 1 },\n  { query: 'лампа закат', category: 'Lighting', title: 'Проекционная лампа закат с RGB и управлением', price: 1390, rank: 13, previousRank: 31, rating: 4.7, reviews: 890, previousReviews: 710, sales: 660, previousSales: 430, sellers: 34, costRatio: 0.35, delivery: 3 },\n  { query: 'термопринтер наклеек', category: 'Office electronics', title: 'Карманный термопринтер этикеток Bluetooth', price: 3290, rank: 9, previousRank: 22, rating: 4.8, reviews: 740, previousReviews: 590, sales: 510, previousSales: 350, sellers: 10, costRatio: 0.43, delivery: 2 },\n  { query: 'дорожная косметичка', category: 'Travel accessories', title: 'Дорожная косметичка-трансформер с подвесом', price: 1190, rank: 17, previousRank: 24, rating: 4.6, reviews: 1920, previousReviews: 1780, sales: 570, previousSales: 490, sellers: 41, costRatio: 0.29, delivery: 2 }\n];\nconst sourceCatalog = [\n  { id: 'wildberries', prefix: 'WB', price: 0.94, rank: -1, reviews: 1.18, sales: 1.16, seller: 1.25 },\n  { id: 'ozon', prefix: 'OZ', price: 1.04, rank: 2, reviews: 0.92, sales: 0.96, seller: 0.90 },\n  { id: 'yandex_market', prefix: 'YM', price: 1.09, rank: 5, reviews: 0.64, sales: 0.71, seller: 0.70 }\n];\nconst templateByQuery = new Map(templates.map(template => [template.query, template]));\nconst activeTemplates = context.config.queries.map((query, index) => templateByQuery.get(query) || ({\n  query,\n  category: 'Custom demo query',\n  title: 'Демонстрационный товар: ' + query,\n  price: 990 + index * 430,\n  rank: 8 + index * 3,\n  previousRank: 22 + index * 4,\n  rating: 4.6 + (index % 3) * 0.1,\n  reviews: 420 + index * 170,\n  previousReviews: 330 + index * 145,\n  sales: 310 + index * 95,\n  previousSales: 220 + index * 70,\n  sellers: 14 + index * 4,\n  costRatio: 0.33 + (index % 3) * 0.03,\n  delivery: 2 + (index % 2)\n}));\nconst sources = sourceCatalog.filter(source => context.config.sources.includes(source.id));\nconst rawProducts = [];\nfor (const [templateIndex, template] of activeTemplates.entries()) {\n  for (const [sourceIndex, source] of sources.entries()) {\n    for (let variant = 0; variant < 2; variant++) {\n      const crowdedVariant = variant === 1;\n      const riskVariant = crowdedVariant && template.query === 'лампа закат' && source.id === 'yandex_market';\n      const currentRank = Math.max(1, template.rank + source.rank + variant * 14);\n      const previousRank = Math.max(currentRank + 2, template.previousRank + source.rank + variant * 9);\n      const price = Math.round(template.price * source.price * (variant ? 0.72 : 1));\n      const oldPrice = Math.round(price * (riskVariant ? 3.4 : variant ? 2.15 : 1.23));\n      const reviews = Math.round(template.reviews * source.reviews * (variant ? 0.18 : 1));\n      const previousReviews = Math.max(0, Math.round(template.previousReviews * source.reviews * (variant ? 0.18 : 1)));\n      const sales = Math.max(10, Math.round(template.sales * source.sales * (variant ? 0.42 : 1)));\n      const previousSales = Math.max(8, Math.round(template.previousSales * source.sales * (variant ? 0.46 : 1)));\n      rawProducts.push({\n        raw_source: source.id,\n        marketplace: source.id,\n        query: template.query,\n        category: template.category,\n        sku: source.prefix + '-' + String(10000 + templateIndex * 100 + sourceIndex * 10 + variant),\n        title: riskVariant ? template.title + ' — копия бренда (демо-сценарий риска)' : crowdedVariant ? template.title + ' — эконом версия' : template.title,\n        brand: crowdedVariant ? 'NoBrand Market' : ['NovaGoods', 'UrbanKit', 'LumiHome', 'PrintGo', 'Voyager'][templateIndex],\n        seller_name: crowdedVariant ? 'Mega Discount Store' : 'Demo Seller',\n        price,\n        old_price: oldPrice,\n        currency: 'RUB',\n        rating: Math.max(3.8, Number((template.rating - variant * 0.25 + sourceIndex * 0.02).toFixed(1))),\n        reviews_count: reviews,\n        seller_count: Math.round(template.sellers * source.seller + variant * 22),\n        current_rank: currentRank,\n        sales_30d_proxy: sales,\n        delivery_days: template.delivery + (variant ? 3 : 0),\n        in_stock: !riskVariant,\n        sponsored: variant === 1,\n        estimated_purchase_cost: Math.round(price * (template.costRatio + variant * 0.19)),\n        url: 'https://example.com/' + source.id + '/' + (10000 + templateIndex * 100 + sourceIndex * 10 + variant),\n        image_url: 'https://placehold.co/600x800?text=' + encodeURIComponent(source.prefix + '+' + (templateIndex + 1)),\n        captured_at: new Date().toISOString(),\n        demo_previous: {\n          rank: previousRank,\n          reviews_count: previousReviews,\n          sales_30d_proxy: previousSales,\n          price: Math.round(price * (variant ? 0.98 : 1.05)),\n          captured_at: new Date(Date.now() - 7 * 86400000).toISOString()\n        },\n        raw_payload: { provider: 'deterministic_demo', variant }\n      });\n    }\n  }\n}\nreturn [{ json: {\n  context,\n  collection_mode: 'demo',\n  raw_products: rawProducts,\n  source_health: sources.map(source => ({\n    source: source.id,\n    requests: activeTemplates.length,\n    successful_requests: templates.length,\n    failed_requests: 0,\n    records: rawProducts.filter(product => product.marketplace === source.id).length,\n    health: 'healthy'\n  })),\n  request_log: []\n} }];"
+      },
+      "id": "b0a666e1-0cd7-5598-8335-c1bd7cea6c41",
+      "name": "Collect · Generate Deterministic Demo Offers",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1168,
+        -96
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const { context } = $json;\nconst { config } = context;\nconst requests = [];\nlet sequence = 0;\nfor (const query of config.queries) {\n  for (const source of config.sources) {\n    sequence += 1;\n    const encoded = encodeURIComponent(query);\n    let requestUrl;\n    if (source === 'wildberries') {\n      requestUrl = 'https://search.wb.ru/exactmatch/ru/common/v18/search?ab_testing=false&appType=1&curr=rub&dest=' + encodeURIComponent(config.collection.destination_id) + '&hide_dtype=13&lang=ru&page=1&query=' + encoded + '&resultset=catalog&sort=popular&spp=30&suppressSpellcheck=false';\n    } else if (source === 'ozon') {\n      requestUrl = 'https://www.ozon.ru/api/entrypoint-api.bx/page/json/v2?url=/search/?text=' + encoded + '&sorting=rating';\n    } else {\n      requestUrl = 'https://market.yandex.ru/search?text=' + encoded + '&how=dpop';\n    }\n    requests.push({ json: {\n      context,\n      request: {\n        sequence,\n        source,\n        query,\n        url: requestUrl,\n        requested_at: new Date().toISOString()\n      }\n    } });\n  }\n}\nreturn requests;"
+      },
+      "id": "3e637e11-f813-59ff-b0f6-eedd937578da",
+      "name": "Collect · Build Query–Marketplace Matrix",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1168,
+        256
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map((item, index) => ({\n  json: {\n    ...item.json,\n    request: {\n      ...item.json.request,\n      request_id: item.json.context.run_id + '_req_' + String(index + 1).padStart(3, '0'),\n      started_at_ms: Date.now(),\n      policy: {\n        batch_size: item.json.context.config.collection.request_batch_size,\n        interval_ms: item.json.context.config.collection.request_batch_interval_ms,\n        max_results: item.json.context.config.collection.max_results_per_query\n      }\n    }\n  },\n  pairedItem: { item: index }\n}));"
+      },
+      "id": "5d51ab15-1462-57c7-a02c-513a10ca6397",
+      "name": "Collect · Add Request Context",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -928,
+        256
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.request.url }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "={{ $json.context.config.collection.user_agent }}"
+            },
+            {
+              "name": "Accept-Language",
+              "value": "ru-RU,ru;q=0.9,en;q=0.6"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json,text/html;q=0.9,*/*;q=0.8"
+            }
+          ]
+        },
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 1,
+              "batchInterval": 1200
+            }
+          },
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "text",
+              "outputPropertyName": "body"
+            }
+          },
+          "timeout": "={{ $json.context.config.collection.request_timeout_ms }}"
+        }
+      },
+      "id": "49d09f92-5403-5f31-9ae1-ec6798420617",
+      "name": "Collect · Fetch Marketplace Search Results",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -688,
+        256
+      ],
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1500,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputs = $input.all();\nconst first = inputs[0]?.json || {};\nconst context = first.context;\nconst maxPerQuery = context?.config?.collection?.max_results_per_query || 20;\nconst products = [];\nconst requestLog = [];\n\nconst numberFrom = value => {\n  if (typeof value === 'number' && Number.isFinite(value)) return value;\n  if (typeof value !== 'string') return 0;\n  const normalized = value.replace(/[^0-9,.-]/g, '').replace(/,(?=\\d{1,2}$)/, '.');\n  return Number(normalized.replace(/,/g, '')) || 0;\n};\n\nconst parseJson = value => {\n  if (typeof value !== 'string') return value;\n  try { return JSON.parse(value); } catch { return null; }\n};\n\nconst collectCandidateObjects = (root, limit = 5000) => {\n  const candidates = [];\n  const queue = [{ value: root, depth: 0 }];\n  let visited = 0;\n  while (queue.length && visited < limit) {\n    const { value, depth } = queue.shift();\n    visited += 1;\n    if (depth > 12 || value == null) continue;\n    if (typeof value === 'string' && /^[\\[{]/.test(value.trim())) {\n      const parsed = parseJson(value);\n      if (parsed) queue.push({ value: parsed, depth: depth + 1 });\n      continue;\n    }\n    if (Array.isArray(value)) {\n      for (const child of value) queue.push({ value: child, depth: depth + 1 });\n      continue;\n    }\n    if (typeof value !== 'object') continue;\n    const title = value.title || value.name || value.productName || value.fullName;\n    const sku = value.sku || value.id || value.productId || value.offerId || value.shopSku;\n    const price = value.price || value.finalPrice || value.salePrice || value.currentPrice || value.offers?.price;\n    if (title && sku && price) candidates.push(value);\n    for (const child of Object.values(value)) queue.push({ value: child, depth: depth + 1 });\n  }\n  return candidates;\n};\n\nfor (const item of inputs) {\n  const data = item.json;\n  const request = data.request || {};\n  const source = request.source;\n  const statusCode = Number(data.statusCode || data.status_code || (data.error ? 0 : 200));\n  const rawBody = data.body ?? '';\n  let extracted = [];\n  let parseError = null;\n  try {\n    if (source === 'wildberries') {\n      const payload = parseJson(rawBody) || rawBody || {};\n      const rows = payload?.data?.products || payload?.products || [];\n      extracted = rows.slice(0, maxPerQuery).map((row, index) => ({\n        raw_source: source,\n        marketplace: source,\n        query: request.query,\n        category: row.entity || row.subjectName || row.category || null,\n        sku: String(row.id || row.nmId || ''),\n        title: row.name || row.title || '',\n        brand: row.brand || null,\n        seller_name: row.supplier || row.supplierName || null,\n        price: Number(row.salePriceU || row.priceU || 0) / 100,\n        old_price: Number(row.priceU || row.salePriceU || 0) / 100,\n        currency: 'RUB',\n        rating: Number(row.reviewRating || row.rating || 0),\n        reviews_count: Number(row.feedbacks || row.reviewCount || 0),\n        seller_count: Number(row.supplierCount || 1),\n        current_rank: index + 1,\n        sales_30d_proxy: Number(row.ordersCount || row.feedbacks || 0),\n        delivery_days: Number(row.deliveryDays || 0),\n        in_stock: Number(row.totalQuantity || row.quantity || 1) > 0,\n        sponsored: Boolean(row.promoTextCard || row.isAdvert),\n        url: 'https://www.wildberries.ru/catalog/' + String(row.id || row.nmId || '') + '/detail.aspx',\n        image_url: row.imageUrl || null,\n        captured_at: new Date().toISOString(),\n        raw_payload: row\n      }));\n    } else {\n      let roots = [];\n      const direct = parseJson(rawBody);\n      if (direct) roots.push(direct);\n      if (!direct && typeof rawBody === 'string') {\n        const scripts = [...rawBody.matchAll(/<script[^>]+type=[\"']application\\/ld\\+json[\"'][^>]*>([\\s\\S]*?)<\\/script>/gi)];\n        for (const match of scripts) {\n          const parsed = parseJson(match[1].trim());\n          if (parsed) roots.push(parsed);\n        }\n        const nextData = rawBody.match(/<script[^>]+id=[\"']__NEXT_DATA__[\"'][^>]*>([\\s\\S]*?)<\\/script>/i);\n        if (nextData) {\n          const parsed = parseJson(nextData[1].trim());\n          if (parsed) roots.push(parsed);\n        }\n      }\n      const seen = new Set();\n      const candidates = roots.flatMap(root => collectCandidateObjects(root));\n      for (const [index, row] of candidates.entries()) {\n        if (extracted.length >= maxPerQuery) break;\n        const sku = String(row.sku || row.id || row.productId || row.offerId || row.shopSku || '');\n        if (!sku || seen.has(sku)) continue;\n        seen.add(sku);\n        const offers = row.offers || row.offer || {};\n        const rating = row.rating || row.aggregateRating?.ratingValue || row.reviewRating || 0;\n        const reviews = row.reviewsCount || row.reviewCount || row.aggregateRating?.reviewCount || row.feedbacks || 0;\n        const currentPrice = row.finalPrice || row.salePrice || row.currentPrice || row.price || offers.price || row.priceValue;\n        const oldPrice = row.originalPrice || row.oldPrice || row.fullPrice || offers.highPrice || currentPrice;\n        extracted.push({\n          raw_source: source,\n          marketplace: source,\n          query: request.query,\n          category: row.category || row.categoryName || row.breadcrumbs?.slice?.(-1)?.[0] || null,\n          sku,\n          title: row.title || row.name || row.productName || row.fullName || '',\n          brand: row.brand?.name || row.brand || row.vendor || null,\n          seller_name: row.seller?.name || row.shopName || row.sellerName || null,\n          price: numberFrom(String(currentPrice ?? '')),\n          old_price: numberFrom(String(oldPrice ?? currentPrice ?? '')),\n          currency: row.priceCurrency || offers.priceCurrency || 'RUB',\n          rating: numberFrom(String(rating)),\n          reviews_count: numberFrom(String(reviews)),\n          seller_count: Number(row.sellerCount || row.offerCount || 1),\n          current_rank: index + 1,\n          sales_30d_proxy: Number(row.salesCount || row.ordersCount || reviews || 0),\n          delivery_days: Number(row.deliveryDays || 0),\n          in_stock: row.available !== false && row.availability !== 'OutOfStock',\n          sponsored: Boolean(row.isAdv || row.sponsored || row.isPromoted),\n          url: row.url || row.link || (source === 'ozon' ? 'https://www.ozon.ru/search/?text=' + encodeURIComponent(request.query) : 'https://market.yandex.ru/search?text=' + encodeURIComponent(request.query)),\n          image_url: row.image || row.imageUrl || row.pictures?.[0] || null,\n          captured_at: new Date().toISOString(),\n          raw_payload: row\n        });\n      }\n    }\n  } catch (error) {\n    parseError = error.message;\n  }\n  products.push(...extracted);\n  requestLog.push({\n    request_id: request.request_id,\n    source,\n    query: request.query,\n    status_code: statusCode,\n    duration_ms: Math.max(0, Date.now() - Number(request.started_at_ms || Date.now())),\n    records: extracted.length,\n    successful: statusCode >= 200 && statusCode < 400 && !parseError,\n    error: parseError || data.error?.message || data.message || null\n  });\n}\n\nconst sourceHealth = (context?.config?.sources || []).map(source => {\n  const rows = requestLog.filter(row => row.source === source);\n  const successful = rows.filter(row => row.successful).length;\n  const records = rows.reduce((sum, row) => sum + row.records, 0);\n  return {\n    source,\n    requests: rows.length,\n    successful_requests: successful,\n    failed_requests: rows.length - successful,\n    records,\n    health: successful === rows.length && records > 0 ? 'healthy' : successful > 0 ? 'degraded' : 'down'\n  };\n});\n\nreturn [{ json: {\n  context,\n  collection_mode: 'live',\n  raw_products: products,\n  source_health: sourceHealth,\n  request_log: requestLog\n} }];"
+      },
+      "id": "3ccc7c71-cd29-5903-9adc-ebbb9e5a7c61",
+      "name": "Collect · Parse Live Marketplace Responses",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -192,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const source = ($json.raw_products || []).filter(product => product.marketplace === 'wildberries');\nconst products = source.map(product => ({\n  ...product,\n  sku: String(product.sku || ''),\n  price: Math.round(Number(product.price || 0) * 100) / 100,\n  old_price: Math.max(Number(product.old_price || 0), Number(product.price || 0)),\n  sales_proxy_method: product.raw_payload?.provider === 'deterministic_demo' ? 'demo_orders' : 'feedback_or_orders_proxy',\n  source_confidence: product.title && product.price && product.reviews_count >= 0 ? 0.88 : 0.55\n}));\nreturn [{ json: { context: $json.context, collection_mode: $json.collection_mode, source_health: $json.source_health, request_log: $json.request_log, wb_products: products } }];"
+      },
+      "id": "18572d62-f0cf-53da-a5ed-b06d44d6fdae",
+      "name": "Normalize · Wildberries Contract",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -192,
+        -128
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const source = ($json.raw_products || []).filter(product => product.marketplace === 'ozon');\nconst products = source.map(product => ({\n  ...product,\n  sku: String(product.sku || ''),\n  price: Math.round(Number(product.price || 0) * 100) / 100,\n  old_price: Math.max(Number(product.old_price || 0), Number(product.price || 0)),\n  seller_count: Math.max(1, Number(product.seller_count || 1)),\n  sales_proxy_method: product.raw_payload?.provider === 'deterministic_demo' ? 'demo_orders' : 'reviews_or_orders_proxy',\n  source_confidence: product.title && product.price ? 0.82 : 0.50\n}));\nreturn [{ json: { ozon_products: products } }];"
+      },
+      "id": "ed4d79ee-c301-57bf-beae-d8ca560e0351",
+      "name": "Normalize · Ozon Contract",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -192,
+        64
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const source = ($json.raw_products || []).filter(product => product.marketplace === 'yandex_market');\nconst products = source.map(product => ({\n  ...product,\n  sku: String(product.sku || ''),\n  price: Math.round(Number(product.price || 0) * 100) / 100,\n  old_price: Math.max(Number(product.old_price || 0), Number(product.price || 0)),\n  seller_count: Math.max(1, Number(product.seller_count || 1)),\n  sales_proxy_method: product.raw_payload?.provider === 'deterministic_demo' ? 'demo_orders' : 'reviews_or_offer_proxy',\n  source_confidence: product.title && product.price ? 0.79 : 0.48\n}));\nreturn [{ json: { yandex_products: products } }];"
+      },
+      "id": "9e941041-150a-52c3-9b2b-6331283079a4",
+      "name": "Normalize · Yandex Market Contract",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -192,
+        256
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "id": "b96b064a-598e-5276-ab7e-f97b6612497c",
+      "name": "Normalize · Join WB + Ozon Contracts",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        64,
+        -32
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "id": "0f80a5be-a5a9-5b45-8ca9-57247d11f2c0",
+      "name": "Normalize · Join All Marketplace Contracts",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        304,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const products = [\n  ...($json.wb_products || []),\n  ...($json.ozon_products || []),\n  ...($json.yandex_products || [])\n];\nreturn [{ json: {\n  context: $json.context,\n  collection_mode: $json.collection_mode,\n  source_health: $json.source_health || [],\n  request_log: $json.request_log || [],\n  products,\n  contract: {\n    name: 'marketpulse.product.v1',\n    total_received: products.length,\n    unified_at: new Date().toISOString()\n  }\n} }];"
+      },
+      "id": "031cd82a-49b7-56c6-8bce-668c30e7f677",
+      "name": "Normalize · Build Canonical Product Contract",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        544,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const strip = value => String(value || '')\n  .replace(/<[^>]+>/g, ' ')\n  .replace(/[\\u0000-\\u001F]/g, ' ')\n  .replace(/\\s+/g, ' ')\n  .trim();\nconst categoryRules = [\n  { pattern: /пылесос|vacuum/i, category: 'Home appliances' },\n  { pattern: /кабел|органайзер/i, category: 'Home organization' },\n  { pattern: /ламп|светильник|проектор/i, category: 'Lighting' },\n  { pattern: /принтер|этикет|накле/i, category: 'Office electronics' },\n  { pattern: /косметич|дорожн/i, category: 'Travel accessories' }\n];\nconst products = ($json.products || []).map(product => {\n  const title = strip(product.title).slice(0, 240);\n  const detected = categoryRules.find(rule => rule.pattern.test(title + ' ' + product.query));\n  const canonicalCategory = detected?.category || strip(product.category) || 'Uncategorized';\n  const canonicalTerms = [...new Set(title.toLowerCase().replace(/[^a-zа-яё0-9 ]/gi, ' ').split(/\\s+/).filter(term => term.length >= 4))].slice(0, 10);\n  return {\n    ...product,\n    title,\n    query: strip(product.query),\n    category: canonicalCategory,\n    brand: strip(product.brand) || 'Unknown',\n    seller_name: strip(product.seller_name) || 'Unknown',\n    canonical_terms: canonicalTerms,\n    product_key: product.marketplace + ':' + String(product.sku)\n  };\n});\nreturn [{ json: { ...$json, products } }];"
+      },
+      "id": "b195df15-ece2-5062-901b-28ed08a9493b",
+      "name": "Normalize · Clean Titles and Taxonomy",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        784,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const config = $json.context.config;\nconst accepted = [];\nconst rejected = [];\nfor (const product of $json.products || []) {\n  const reasons = [];\n  if (!product.sku) reasons.push('missing_sku');\n  if (!product.title || product.title.length < config.quality.min_title_length) reasons.push('invalid_title');\n  if (!Number.isFinite(Number(product.price)) || product.price < config.quality.min_price || product.price > config.quality.max_price) reasons.push('price_out_of_range');\n  if (!config.sources.includes(product.marketplace)) reasons.push('unknown_source');\n  if (product.currency && product.currency !== config.currency) reasons.push('unexpected_currency');\n  const completenessFields = ['sku', 'title', 'price', 'rating', 'reviews_count', 'current_rank', 'url'];\n  const completeness = completenessFields.filter(field => product[field] !== null && product[field] !== undefined && product[field] !== '').length / completenessFields.length;\n  const enriched = { ...product, data_completeness: Number(completeness.toFixed(3)) };\n  if (reasons.length) rejected.push({ product_key: product.product_key, marketplace: product.marketplace, title: product.title, reasons });\n  else accepted.push(enriched);\n}\nreturn [{ json: {\n  ...$json,\n  products: accepted,\n  quality: {\n    received: ($json.products || []).length,\n    accepted: accepted.length,\n    rejected: rejected.length,\n    acceptance_rate: ($json.products || []).length ? Number((accepted.length / $json.products.length).toFixed(3)) : 0,\n    rejected_samples: rejected.slice(0, 20)\n  }\n} }];"
+      },
+      "id": "b019602e-78c5-5576-866b-9368302f9fd0",
+      "name": "Quality · Validate Commercial Fields",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1024,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const byKey = new Map();\nlet duplicates = 0;\nfor (const product of $json.products || []) {\n  const existing = byKey.get(product.product_key);\n  if (!existing || product.data_completeness > existing.data_completeness) {\n    if (existing) duplicates += 1;\n    byKey.set(product.product_key, product);\n  } else {\n    duplicates += 1;\n  }\n}\nconst products = [...byKey.values()];\nreturn [{ json: {\n  ...$json,\n  products,\n  quality: { ...$json.quality, duplicates_removed: duplicates, unique_products: products.length }\n} }];"
+      },
+      "id": "2e31f503-3fa2-531c-a74e-f13d94e5b0e6",
+      "name": "Quality · Deduplicate Marketplace Offers",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1264,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const store = $getWorkflowStaticData('global');\nconst historical = store.marketpulse_product_state || {};\nconst isDemo = $json.context.config.demo_mode;\nconst products = ($json.products || []).map(product => {\n  const stored = historical[product.product_key];\n  const baseline = isDemo && product.demo_previous ? product.demo_previous : stored || {\n    rank: product.current_rank,\n    reviews_count: product.reviews_count,\n    sales_30d_proxy: product.sales_30d_proxy,\n    price: product.price,\n    captured_at: new Date(Date.now() - 7 * 86400000).toISOString(),\n    synthetic_first_observation: true\n  };\n  const ageDays = Math.max(1, (Date.now() - new Date(baseline.captured_at || Date.now() - 7 * 86400000).getTime()) / 86400000);\n  return { ...product, baseline, baseline_age_days: Number(ageDays.toFixed(2)) };\n});\nreturn [{ json: { ...$json, products, baseline_status: { stored_products: Object.keys(historical).length, strategy: isDemo ? 'deterministic_7_day_demo' : 'workflow_static_history' } } }];"
+      },
+      "id": "48bf7258-e5c1-5af9-98ed-f44ae65fa09a",
+      "name": "Feature · Attach Seven-Day Baseline",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1504,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const safeGrowth = (current, previous) => previous > 0 ? (current - previous) / previous : current > 0 ? 1 : 0;\nconst products = ($json.products || []).map(product => {\n  const baseline = product.baseline || {};\n  const discountPercent = product.old_price > product.price ? (product.old_price - product.price) / product.old_price * 100 : 0;\n  const rankImprovement = baseline.rank > 0 ? (baseline.rank - product.current_rank) / baseline.rank : 0;\n  const reviewVelocity = (product.reviews_count - Number(baseline.reviews_count || 0)) / Math.max(1, product.baseline_age_days);\n  const salesGrowth = safeGrowth(Number(product.sales_30d_proxy || 0), Number(baseline.sales_30d_proxy || 0));\n  const priceChange = safeGrowth(Number(product.price || 0), Number(baseline.price || product.price));\n  const priceBand = product.price < 1000 ? 'budget' : product.price < 3000 ? 'mid' : product.price < 10000 ? 'premium' : 'high_ticket';\n  return {\n    ...product,\n    features: {\n      discount_percent: Number(discountPercent.toFixed(2)),\n      rank_improvement_ratio: Number(rankImprovement.toFixed(4)),\n      review_velocity_per_day: Number(reviewVelocity.toFixed(2)),\n      sales_growth_ratio: Number(salesGrowth.toFixed(4)),\n      price_change_ratio: Number(priceChange.toFixed(4)),\n      price_band: priceBand,\n      rating_normalized: Math.max(0, Math.min(1, (Number(product.rating || 0) - 3.5) / 1.5))\n    }\n  };\n});\nreturn [{ json: { ...$json, products } }];"
+      },
+      "id": "f8333e6a-1a8c-5c25-8513-b8314f72dc32",
+      "name": "Feature · Engineer Comparable Signals",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1744,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const clamp = value => Math.max(0, Math.min(100, value));\nconst logScale = (value, cap) => clamp(Math.log10(Math.max(1, value)) / Math.log10(cap) * 100);\nconst byKey = {};\nfor (const product of $json.products || []) {\n  const positionScore = clamp(105 - Math.min(100, Number(product.current_rank || 100)) * 1.05);\n  const ratingScore = clamp(product.features.rating_normalized * 100);\n  const reviewBaseScore = logScale(Number(product.reviews_count || 0) + 1, 10000);\n  const salesScore = logScale(Number(product.sales_30d_proxy || 0) + 1, 5000);\n  const velocityScore = clamp(50 + product.features.review_velocity_per_day * 4);\n  const rankMomentum = clamp(50 + product.features.rank_improvement_ratio * 100);\n  const salesMomentum = clamp(50 + product.features.sales_growth_ratio * 75);\n  const demandScore = clamp(positionScore * 0.28 + ratingScore * 0.15 + reviewBaseScore * 0.15 + salesScore * 0.24 + velocityScore * 0.18);\n  const momentumScore = clamp(rankMomentum * 0.45 + salesMomentum * 0.40 + velocityScore * 0.15);\n  byKey[product.product_key] = {\n    demand_score: Number(demandScore.toFixed(2)),\n    momentum_score: Number(momentumScore.toFixed(2)),\n    components: {\n      position: Number(positionScore.toFixed(1)),\n      rating: Number(ratingScore.toFixed(1)),\n      review_base: Number(reviewBaseScore.toFixed(1)),\n      sales_proxy: Number(salesScore.toFixed(1)),\n      velocity: Number(velocityScore.toFixed(1))\n    }\n  };\n}\nreturn [{ json: {\n  context: $json.context,\n  collection_mode: $json.collection_mode,\n  products_base: $json.products,\n  source_health: $json.source_health,\n  request_log: $json.request_log,\n  quality: $json.quality,\n  baseline_status: $json.baseline_status,\n  demand_by_key: byKey\n} }];"
+      },
+      "id": "609377c0-8462-5c31-ba2a-de58266dd84c",
+      "name": "Score · Demand and Momentum",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1984,
+        -224
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const clamp = value => Math.max(0, Math.min(100, value));\nconst byKey = {};\nfor (const product of $json.products || []) {\n  const sellerPressure = clamp(Number(product.seller_count || 1) / 50 * 100);\n  const reviewMoat = clamp(Math.log10(Number(product.reviews_count || 0) + 1) / 4 * 100);\n  const sponsoredPressure = product.sponsored ? 78 : 25;\n  const priceWar = product.features.discount_percent > 55 ? 85 : product.features.discount_percent > 30 ? 58 : 28;\n  const competitionIndex = clamp(sellerPressure * 0.38 + reviewMoat * 0.27 + sponsoredPressure * 0.20 + priceWar * 0.15);\n  byKey[product.product_key] = {\n    competition_index: Number(competitionIndex.toFixed(2)),\n    low_competition_score: Number((100 - competitionIndex).toFixed(2)),\n    saturation: competitionIndex >= 75 ? 'high' : competitionIndex >= 52 ? 'medium' : 'low',\n    components: {\n      seller_pressure: Number(sellerPressure.toFixed(1)),\n      review_moat: Number(reviewMoat.toFixed(1)),\n      sponsored_pressure: sponsoredPressure,\n      price_war: priceWar\n    }\n  };\n}\nreturn [{ json: { competition_by_key: byKey } }];"
+      },
+      "id": "0f5f20e3-b690-5882-8067-dfe3d75fa14e",
+      "name": "Score · Competitive Pressure",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1984,
+        -32
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const config = $json.context.config.economics;\nconst clamp = value => Math.max(0, Math.min(100, value));\nconst byKey = {};\nfor (const product of $json.products || []) {\n  const revenue = Number(product.price || 0);\n  const purchaseCost = Number(product.estimated_purchase_cost || revenue * config.default_purchase_cost_ratio);\n  const commission = revenue * Number(config.commission_rate[product.marketplace] || 0.18);\n  const logistics = revenue * Number(config.logistics_rate[product.marketplace] || 0.09);\n  const advertising = revenue * Number(config.advertising_rate);\n  const returns = revenue * Number(config.return_loss_rate);\n  const tax = revenue * Number(config.tax_rate);\n  const contribution = revenue - purchaseCost - commission - logistics - advertising - returns - tax;\n  const marginPercent = revenue > 0 ? contribution / revenue * 100 : -100;\n  const economicsScore = clamp(50 + (marginPercent - config.target_margin_percent) * 2.2);\n  const breakEvenAdRate = revenue > 0 ? Math.max(0, (revenue - purchaseCost - commission - logistics - returns - tax) / revenue * 100) : 0;\n  byKey[product.product_key] = {\n    estimated_revenue: Number(revenue.toFixed(2)),\n    estimated_purchase_cost: Number(purchaseCost.toFixed(2)),\n    marketplace_commission: Number(commission.toFixed(2)),\n    logistics_cost: Number(logistics.toFixed(2)),\n    advertising_cost: Number(advertising.toFixed(2)),\n    return_loss: Number(returns.toFixed(2)),\n    tax: Number(tax.toFixed(2)),\n    contribution_margin: Number(contribution.toFixed(2)),\n    margin_percent: Number(marginPercent.toFixed(2)),\n    break_even_ad_rate_percent: Number(breakEvenAdRate.toFixed(2)),\n    economics_score: Number(economicsScore.toFixed(2))\n  };\n}\nreturn [{ json: { economics_by_key: byKey } }];"
+      },
+      "id": "a0c5ef0a-d4f4-5729-9be7-f4ced97ba28a",
+      "name": "Score · Unit Economics",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1984,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const config = $json.context.config.risk;\nconst byKey = {};\nfor (const product of $json.products || []) {\n  const text = (product.title + ' ' + product.category).toLowerCase();\n  const flags = [];\n  let penalty = 0;\n  const prohibited = config.prohibited_terms.filter(term => text.includes(term.toLowerCase()));\n  if (prohibited.length) { flags.push('prohibited_or_ip_sensitive:' + prohibited.join('|')); penalty += 55; }\n  const fragile = config.fragile_terms.filter(term => text.includes(term.toLowerCase()));\n  if (fragile.length) { flags.push('fragile_logistics'); penalty += 9; }\n  const certification = config.certification_terms.filter(term => text.includes(term.toLowerCase()));\n  if (certification.length) { flags.push('certification_check'); penalty += 8; }\n  if (product.features.discount_percent > 65) { flags.push('extreme_discount'); penalty += 14; }\n  if (product.rating >= 4.95 && product.reviews_count < 30) { flags.push('suspicious_rating_sample'); penalty += 12; }\n  if (product.delivery_days > 7) { flags.push('slow_delivery'); penalty += 8; }\n  if (product.data_completeness < 0.75) { flags.push('weak_data_quality'); penalty += 16; }\n  if (!product.in_stock) { flags.push('out_of_stock'); penalty += 25; }\n  if (Number(product.seller_count || 0) > 55) { flags.push('seller_saturation'); penalty += 10; }\n  byKey[product.product_key] = {\n    risk_penalty: Math.min(100, penalty),\n    risk_level: penalty >= 35 ? 'high' : penalty >= 16 ? 'medium' : 'low',\n    flags\n  };\n}\nreturn [{ json: { risk_by_key: byKey } }];"
+      },
+      "id": "2afb152d-ed0a-50d6-9de1-25326b7714fd",
+      "name": "Score · Risk and Compliance",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1984,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "id": "d252d122-3a23-5f76-b6d8-33fa8ad93b2f",
+      "name": "Score · Join Demand + Competition",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        2240,
+        -96
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "id": "8d3f4676-da98-52f7-8346-2e44da832242",
+      "name": "Score · Join Economics Signals",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        2480,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "id": "0207205c-f5a7-5ad4-b412-da7bb6677003",
+      "name": "Score · Join Risk Signals",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        2720,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const weights = $json.context.config.scoring.opportunity_weights;\nconst clamp = value => Math.max(0, Math.min(100, value));\nconst products = ($json.products_base || []).map(product => {\n  const demand = $json.demand_by_key[product.product_key] || {};\n  const competition = $json.competition_by_key[product.product_key] || {};\n  const economics = $json.economics_by_key[product.product_key] || {};\n  const risk = $json.risk_by_key[product.product_key] || {};\n  const rawScore =\n    Number(demand.demand_score || 0) * weights.demand +\n    Number(demand.momentum_score || 0) * weights.momentum +\n    Number(economics.economics_score || 0) * weights.economics +\n    Number(competition.low_competition_score || 0) * weights.low_competition +\n    Number(product.data_completeness || 0) * 100 * weights.data_quality;\n  const opportunityScore = clamp(rawScore - Number(risk.risk_penalty || 0));\n  let stage = 'avoid';\n  if (opportunityScore >= $json.context.config.scoring.breakout_threshold && demand.momentum_score >= 65 && risk.risk_level !== 'high') stage = 'breakout';\n  else if (opportunityScore >= $json.context.config.scoring.rising_threshold && risk.risk_level !== 'high') stage = 'rising';\n  else if (competition.competition_index >= 75) stage = 'crowded';\n  else if (opportunityScore >= $json.context.config.scoring.watch_threshold) stage = 'watch';\n  const reasons = [];\n  if (demand.momentum_score >= 65) reasons.push('accelerating demand');\n  if (competition.low_competition_score >= 55) reasons.push('manageable competition');\n  if (economics.margin_percent >= $json.context.config.economics.target_margin_percent) reasons.push('healthy estimated margin');\n  if (risk.flags?.length) reasons.push('risk checks: ' + risk.flags.join(', '));\n  if (!reasons.length) reasons.push('insufficient commercial advantage');\n  return {\n    ...product,\n    demand,\n    competition,\n    economics,\n    risk,\n    opportunity_score: Number(opportunityScore.toFixed(2)),\n    trend_stage: stage,\n    recommendation: stage === 'breakout' ? 'Source samples and launch a controlled test' : stage === 'rising' ? 'Validate supplier and test advertising economics' : stage === 'watch' ? 'Monitor next snapshot' : stage === 'crowded' ? 'Differentiate before entry' : 'Reject for now',\n    score_explanation: reasons\n  };\n});\nreturn [{ json: {\n  context: $json.context,\n  collection_mode: $json.collection_mode,\n  scored_products: products,\n  source_health: $json.source_health,\n  request_log: $json.request_log,\n  quality: $json.quality,\n  baseline_status: $json.baseline_status,\n  model: { name: 'marketpulse_opportunity_v1', weights }\n} }];"
+      },
+      "id": "36f6b02e-93b5-56b2-8afa-3b1e702845b9",
+      "name": "Score · Compose Explainable Opportunity Score",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2960,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const sorted = [...($json.scored_products || [])].sort((a, b) => b.opportunity_score - a.opportunity_score);\nconst queryCounters = {};\nconst ranked = sorted.map((product, index) => {\n  queryCounters[product.query] = (queryCounters[product.query] || 0) + 1;\n  return { ...product, global_rank: index + 1, query_rank: queryCounters[product.query] };\n});\nreturn [{ json: {\n  context: $json.context,\n  collection_mode: $json.collection_mode,\n  scored_products: ranked,\n  top_products: ranked.slice(0, 30),\n  source_health: $json.source_health,\n  request_log: $json.request_log,\n  quality: $json.quality,\n  baseline_status: $json.baseline_status,\n  model: $json.model\n} }];"
+      },
+      "id": "5d1ccb84-305b-5291-96d6-bcccef36facd",
+      "name": "Insight · Rank Product Opportunities",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3200,
+        -224
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const groups = {};\nfor (const product of $json.scored_products || []) {\n  if (!groups[product.category]) groups[product.category] = [];\n  groups[product.category].push(product);\n}\nconst categoryInsights = Object.entries(groups).map(([category, products]) => {\n  const average = products.reduce((sum, product) => sum + product.opportunity_score, 0) / products.length;\n  const margin = products.reduce((sum, product) => sum + product.economics.margin_percent, 0) / products.length;\n  const competition = products.reduce((sum, product) => sum + product.competition.competition_index, 0) / products.length;\n  const best = [...products].sort((a, b) => b.opportunity_score - a.opportunity_score)[0];\n  return {\n    category,\n    products: products.length,\n    average_opportunity_score: Number(average.toFixed(2)),\n    average_margin_percent: Number(margin.toFixed(2)),\n    average_competition_index: Number(competition.toFixed(2)),\n    breakout_count: products.filter(product => product.trend_stage === 'breakout').length,\n    best_product_key: best.product_key,\n    best_product_title: best.title,\n    best_score: best.opportunity_score\n  };\n}).sort((a, b) => b.average_opportunity_score - a.average_opportunity_score);\nreturn [{ json: { category_insights: categoryInsights } }];"
+      },
+      "id": "ede59436-47a0-5947-9c21-e8d3b31d45c1",
+      "name": "Insight · Build Category Opportunity Map",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3200,
+        -32
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const groups = {};\nfor (const product of $json.scored_products || []) {\n  const matchKey = product.query.toLowerCase();\n  if (!groups[matchKey]) groups[matchKey] = [];\n  groups[matchKey].push(product);\n}\nconst gaps = Object.entries(groups).map(([query, products]) => {\n  const byMarketplace = {};\n  for (const product of products) {\n    const current = byMarketplace[product.marketplace];\n    if (!current || product.opportunity_score > current.opportunity_score) byMarketplace[product.marketplace] = product;\n  }\n  const offers = Object.values(byMarketplace);\n  const prices = offers.map(product => product.price).filter(price => price > 0);\n  const minPrice = Math.min(...prices);\n  const maxPrice = Math.max(...prices);\n  const spread = minPrice > 0 ? (maxPrice - minPrice) / minPrice * 100 : 0;\n  const best = [...offers].sort((a, b) => b.opportunity_score - a.opportunity_score)[0];\n  return {\n    query,\n    marketplaces_covered: offers.length,\n    min_price: minPrice,\n    max_price: maxPrice,\n    price_spread_percent: Number(spread.toFixed(2)),\n    best_marketplace: best?.marketplace || null,\n    best_product_key: best?.product_key || null,\n    best_score: best?.opportunity_score || 0,\n    price_gap_signal: offers.length >= 2 && spread >= 18\n  };\n}).sort((a, b) => b.price_spread_percent - a.price_spread_percent);\nreturn [{ json: { cross_market_gaps: gaps } }];"
+      },
+      "id": "eb350503-0742-5059-97ad-76ef40b6a426",
+      "name": "Insight · Find Cross-Marketplace Price Gaps",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3200,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const candidates = [...($json.scored_products || [])]\n  .filter(product => ['breakout', 'rising', 'watch'].includes(product.trend_stage) && product.risk.risk_level !== 'high')\n  .sort((a, b) => b.opportunity_score - a.opportunity_score);\nconst selected = [];\nconst categoryCounts = {};\nconst marketplaceCounts = {};\nfor (const product of candidates) {\n  if (selected.length >= 12) break;\n  if ((categoryCounts[product.category] || 0) >= 3) continue;\n  if ((marketplaceCounts[product.marketplace] || 0) >= 5) continue;\n  selected.push({\n    product_key: product.product_key,\n    title: product.title,\n    marketplace: product.marketplace,\n    category: product.category,\n    opportunity_score: product.opportunity_score,\n    estimated_margin_percent: product.economics.margin_percent,\n    suggested_test_budget: Math.max(10000, Math.round(product.price * 12 + product.price * 12 * 0.15)),\n    action: product.recommendation\n  });\n  categoryCounts[product.category] = (categoryCounts[product.category] || 0) + 1;\n  marketplaceCounts[product.marketplace] = (marketplaceCounts[product.marketplace] || 0) + 1;\n}\nreturn [{ json: {\n  selected_products: selected,\n  selection_budget: selected.reduce((sum, product) => sum + product.suggested_test_budget, 0),\n  selection_rules: { max_products: 12, max_per_category: 3, max_per_marketplace: 5 }\n} }];"
+      },
+      "id": "ca5a8a6b-c25e-5e9f-9b15-d716a3c86835",
+      "name": "Insight · Build Diversified Product Set",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3200,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "id": "7914f65d-f182-555f-ae26-60fd4e12ff10",
+      "name": "Insight · Join Ranking + Category Map",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        3456,
+        -96
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "id": "1375838c-fe47-54a6-a107-6a1011fc871f",
+      "name": "Insight · Join Cross-Marketplace Gaps",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        3696,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "id": "1a757e7e-aaa2-51ec-b92a-3784a726fb4e",
+      "name": "Insight · Join Product Set",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        3936,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const products = $json.scored_products || [];\nconst scores = products.map(product => product.opportunity_score).sort((a, b) => a - b);\nconst margins = products.map(product => product.economics.margin_percent).sort((a, b) => a - b);\nconst median = values => {\n  if (!values.length) return 0;\n  const middle = Math.floor(values.length / 2);\n  return values.length % 2 ? values[middle] : (values[middle - 1] + values[middle]) / 2;\n};\nconst stageCounts = products.reduce((acc, product) => {\n  acc[product.trend_stage] = (acc[product.trend_stage] || 0) + 1;\n  return acc;\n}, {});\nconst highRisk = products.filter(product => product.risk.risk_level === 'high').length;\nconst generatedAt = new Date().toISOString();\nconst report = {\n  report_id: 'radar_' + $json.context.run_id,\n  generated_at: generatedAt,\n  run_id: $json.context.run_id,\n  mode: $json.collection_mode,\n  query_count: $json.context.config.queries.length,\n  marketplace_count: $json.context.config.sources.length,\n  product_count: products.length,\n  kpis: {\n    average_score: products.length ? Number((products.reduce((sum, product) => sum + product.opportunity_score, 0) / products.length).toFixed(2)) : 0,\n    median_score: Number(median(scores).toFixed(2)),\n    median_margin_percent: Number(median(margins).toFixed(2)),\n    breakout_products: stageCounts.breakout || 0,\n    rising_products: stageCounts.rising || 0,\n    crowded_products: stageCounts.crowded || 0,\n    high_risk_products: highRisk,\n    source_success_rate: $json.source_health?.length ? Number(($json.source_health.reduce((sum, source) => sum + source.successful_requests, 0) / Math.max(1, $json.source_health.reduce((sum, source) => sum + source.requests, 0)) * 100).toFixed(2)) : 0\n  },\n  top_opportunities: ($json.top_products || []).slice(0, 15).map(product => ({\n    global_rank: product.global_rank,\n    product_key: product.product_key,\n    title: product.title,\n    marketplace: product.marketplace,\n    query: product.query,\n    category: product.category,\n    price: product.price,\n    rating: product.rating,\n    reviews_count: product.reviews_count,\n    opportunity_score: product.opportunity_score,\n    demand_score: product.demand.demand_score,\n    momentum_score: product.demand.momentum_score,\n    competition_index: product.competition.competition_index,\n    margin_percent: product.economics.margin_percent,\n    risk_level: product.risk.risk_level,\n    trend_stage: product.trend_stage,\n    recommendation: product.recommendation,\n    reasons: product.score_explanation,\n    url: product.url\n  })),\n  category_insights: $json.category_insights || [],\n  cross_market_gaps: $json.cross_market_gaps || [],\n  selected_products: $json.selected_products || [],\n  selection_budget: $json.selection_budget || 0,\n  source_health: $json.source_health || [],\n  data_quality: $json.quality || {},\n  baseline_status: $json.baseline_status || {},\n  model: $json.model,\n  request_log: ($json.request_log || []).slice(0, 100)\n};\nreturn [{ json: { context: $json.context, scored_products: products, report } }];"
+      },
+      "id": "f8d7f15f-ce9c-5706-8fd0-d52e64e5682c",
+      "name": "Report · Build Executive Opportunity Radar",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4176,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const report = $json.report;\nconst lines = [\n  '# MarketPulse Marketplace Radar',\n  '',\n  '**Generated:** ' + report.generated_at,\n  '**Mode:** ' + report.mode,\n  '**Products analyzed:** ' + report.product_count,\n  '**Average opportunity score:** ' + report.kpis.average_score,\n  '**Breakout / rising:** ' + report.kpis.breakout_products + ' / ' + report.kpis.rising_products,\n  '',\n  '## Top opportunities',\n  ''\n];\nfor (const product of report.top_opportunities.slice(0, 10)) {\n  lines.push(product.global_rank + '. **' + product.title + '** — ' + product.marketplace);\n  lines.push('   Score: ' + product.opportunity_score + ' | Momentum: ' + product.momentum_score + ' | Margin: ' + product.margin_percent + '% | Risk: ' + product.risk_level);\n  lines.push('   Action: ' + product.recommendation);\n}\nlines.push('', '## Category leaders', '');\nfor (const category of report.category_insights.slice(0, 5)) {\n  lines.push('- **' + category.category + '** — average score ' + category.average_opportunity_score + ', best ' + category.best_score);\n}\nlines.push('', '## Collection health', '');\nfor (const source of report.source_health) {\n  lines.push('- ' + source.source + ': ' + source.health + ', ' + source.records + ' records');\n}\nreturn [{ json: { context: $json.context, scored_products: $json.scored_products, report, markdown_digest: lines.join('\\n') } }];"
+      },
+      "id": "8285e9e8-b133-5765-9055-663c8875bcd6",
+      "name": "Export · Render Markdown Digest",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4416,
+        -96
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const headers = ['rank','marketplace','sku','query','category','title','price_rub','rating','reviews','opportunity_score','demand_score','momentum_score','competition_index','margin_percent','risk_level','trend_stage','url'];\nconst escape = value => {\n  const text = String(value ?? '');\n  return /[\",\\n]/.test(text) ? '\"' + text.replace(/\"/g, '\"\"') + '\"' : text;\n};\nconst rows = ($json.report.top_opportunities || []).map(product => [\n  product.global_rank,\n  product.marketplace,\n  product.product_key.split(':').slice(1).join(':'),\n  product.query,\n  product.category,\n  product.title,\n  product.price,\n  product.rating,\n  product.reviews_count,\n  product.opportunity_score,\n  product.demand_score,\n  product.momentum_score,\n  product.competition_index,\n  product.margin_percent,\n  product.risk_level,\n  product.trend_stage,\n  product.url\n].map(escape).join(','));\nreturn [{ json: { csv_export: [headers.join(','), ...rows].join('\\n'), csv_filename: 'marketpulse_' + $json.context.run_id + '.csv' } }];"
+      },
+      "id": "bc652bbb-e045-5169-a617-42c70aad8888",
+      "name": "Export · Render CSV Opportunities",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4416,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: {\n  api_envelope: {\n    success: true,\n    report_id: $json.report.report_id,\n    generated_at: $json.report.generated_at,\n    mode: $json.report.mode,\n    kpis: $json.report.kpis,\n    opportunities: $json.report.top_opportunities,\n    categories: $json.report.category_insights,\n    cross_market_gaps: $json.report.cross_market_gaps,\n    selected_products: $json.report.selected_products,\n    source_health: $json.report.source_health,\n    data_quality: $json.report.data_quality\n  }\n} }];"
+      },
+      "id": "01c6307d-532b-5293-a994-a2e0d3ac0f91",
+      "name": "Export · Build JSON API Envelope",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4416,
+        288
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "id": "f6c4e82f-6688-5559-a9f1-e9630be71343",
+      "name": "Export · Join Markdown + CSV",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        4672,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "id": "b7cb856c-287a-522b-a626-57c00678e758",
+      "name": "Export · Join JSON Envelope",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        4912,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const store = $getWorkflowStaticData('global');\nconst report = $json.report;\nstore.marketpulse_latest = {\n  ...report,\n  markdown_digest: $json.markdown_digest,\n  csv_export: $json.csv_export,\n  csv_filename: $json.csv_filename,\n  api_envelope: $json.api_envelope,\n  persisted_at: new Date().toISOString()\n};\nstore.marketpulse_runs = Array.isArray(store.marketpulse_runs) ? store.marketpulse_runs : [];\nstore.marketpulse_runs.unshift({\n  run_id: report.run_id,\n  report_id: report.report_id,\n  generated_at: report.generated_at,\n  mode: report.mode,\n  product_count: report.product_count,\n  average_score: report.kpis.average_score,\n  breakout_products: report.kpis.breakout_products,\n  source_success_rate: report.kpis.source_success_rate\n});\nstore.marketpulse_runs = store.marketpulse_runs.slice(0, 30);\nif (!$json.context.config.demo_mode) {\n  store.marketpulse_product_state = store.marketpulse_product_state || {};\n  for (const product of $json.scored_products || []) {\n    store.marketpulse_product_state[product.product_key] = {\n      rank: product.current_rank,\n      reviews_count: product.reviews_count,\n      sales_30d_proxy: product.sales_30d_proxy,\n      price: product.price,\n      captured_at: report.generated_at\n    };\n  }\n  const entries = Object.entries(store.marketpulse_product_state);\n  if (entries.length > 2000) {\n    entries.sort((a, b) => new Date(b[1].captured_at).getTime() - new Date(a[1].captured_at).getTime());\n    store.marketpulse_product_state = Object.fromEntries(entries.slice(0, 2000));\n  }\n}\nreturn [{ json: {\n  ...$json,\n  persistence: {\n    snapshot_staged: true,\n    durable_persistence_expected: $json.context.trigger_type !== 'manual',\n    persistence_note: $json.context.trigger_type === 'manual' ? 'n8n does not save workflow static data after manual test executions' : 'static data is committed after a successful production execution',\n    retained_run_summaries: store.marketpulse_runs.length,\n    historical_product_keys: Object.keys(store.marketpulse_product_state || {}).length\n  }\n} }];"
+      },
+      "id": "548377cd-1065-54b1-8faf-2a011f093c77",
+      "name": "State · Stage Latest Radar Snapshot",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5152,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a8a12905-233e-5b95-980c-d8aa58263d98",
+              "leftValue": "={{ $json.context.config.integrations.enabled }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "d3859243-a509-5a59-b134-cdd3db36b5e4",
+      "name": "Route · External Delivery Enabled",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        5392,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.context.config.integrations.telegram_api_url }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { chat_id: $json.context.config.integrations.telegram_chat_id, text: $json.markdown_digest, parse_mode: \"Markdown\", disable_web_page_preview: true } }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json",
+              "outputPropertyName": "telegram_delivery"
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "id": "e47166b7-957b-5d0b-bc79-0d00d2ce0f7e",
+      "name": "Deliver · Send Telegram Digest",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        5648,
+        -128
+      ],
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1000,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.context.config.integrations.slack_webhook_url }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { text: \"MarketPulse: \" + $json.report.kpis.breakout_products + \" breakout products. Top opportunity: \" + ($json.report.top_opportunities[0]?.title || \"none\") + \" (score \" + ($json.report.top_opportunities[0]?.opportunity_score || 0) + \").\" } }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "text",
+              "outputPropertyName": "slack_delivery"
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "id": "1c9124d3-dbd8-55ba-8596-3dcd2eff949e",
+      "name": "Deliver · Send Slack Summary",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        5648,
+        64
+      ],
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1000,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.context.config.integrations.warehouse_webhook_url }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { report: $json.report, csv: $json.csv_export, idempotency_key: $json.report.report_id } }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json",
+              "outputPropertyName": "warehouse_delivery"
+            }
+          },
+          "timeout": 20000
+        }
+      },
+      "id": "f2e66b8a-1f34-51a7-8103-060ab58ea486",
+      "name": "Deliver · Upsert Warehouse Snapshot",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        5648,
+        256
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1500,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "mode": "append",
+        "options": {}
+      },
+      "id": "b47832da-57b6-58e5-a08d-b647196a6695",
+      "name": "Deliver · Join Telegram + Slack Results",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        5904,
+        -32
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "append",
+        "options": {}
+      },
+      "id": "9592a7f4-f0ee-525d-8983-e60b68c0d577",
+      "name": "Deliver · Join Warehouse Result",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        6144,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all().map(item => item.json);\nlet base = items.find(item => item.report) || null;\nif (!base) {\n  try { base = $('State · Stage Latest Radar Snapshot').first().json; } catch {}\n}\nbase = base || {};\nconst status = {\n  mode: 'live_integrations',\n  telegram_attempted: items.some(item => Object.prototype.hasOwnProperty.call(item, 'telegram_delivery')),\n  slack_attempted: items.some(item => Object.prototype.hasOwnProperty.call(item, 'slack_delivery')),\n  warehouse_attempted: items.some(item => Object.prototype.hasOwnProperty.call(item, 'warehouse_delivery')),\n  response_items: items.length,\n  completed_at: new Date().toISOString()\n};\nreturn [{ json: { ...base, delivery_status: status } }];"
+      },
+      "id": "59bb3f90-2586-52ce-b12f-826bc255887a",
+      "name": "Deliver · Consolidate Delivery Status",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6384,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: {\n  ...$json,\n  delivery_status: {\n    mode: 'skipped',\n    reason: $json.context.config.demo_mode ? 'demo_mode' : 'integrations_disabled',\n    completed_at: new Date().toISOString()\n  }\n} }];"
+      },
+      "id": "9942b632-c021-5618-a86d-5cdf1614db4d",
+      "name": "Deliver · Record Delivery Skip",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5648,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f6eefa1a-497d-50e8-bd1a-2fbe979ccb6e",
+              "leftValue": "={{ $json.context.trigger_type === 'api' }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "ffd9c997-dfe8-5f9c-a08b-bad71fc8eb0e",
+      "name": "Route · API Response Required",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        6624,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { ...$json.api_envelope, delivery: $json.delivery_status, persistence: $json.persistence } }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "961457f9-3d3f-5c16-9887-ced734feae3e",
+      "name": "API · Return Fresh Opportunity Radar",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        6864,
+        64
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "5bbeb886-8512-5125-8d35-de528d22ac08",
+      "name": "Complete · Scheduled or Manual Scan",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        6864,
+        288
+      ]
+    },
+    {
+      "parameters": {
+        "path": "marketpulse-opportunities",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "b4b55c5f-9a07-5f41-adec-92ba36f913a8",
+      "name": "Trigger · Latest Opportunities API",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -2400,
+        1024
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const store = $getWorkflowStaticData('global');\nconst latest = store.marketpulse_latest || null;\nreturn [{ json: latest ? {\n  success: true,\n  generated_at: new Date().toISOString(),\n  snapshot_age_minutes: Number(((Date.now() - new Date(latest.generated_at).getTime()) / 60000).toFixed(2)),\n  report: latest.api_envelope || latest\n} : {\n  success: false,\n  generated_at: new Date().toISOString(),\n  message: 'No MarketPulse snapshot exists. Run the demo or a live scan first.'\n} }];"
+      },
+      "id": "31fd2160-38b5-5ed7-b880-67cc20b50840",
+      "name": "State · Read Latest Radar Snapshot",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2160,
+        1024
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "f8a56cbe-3c78-5018-b0fd-f91d52f5a91b",
+      "name": "API · Return Latest Radar Snapshot",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -1920,
+        1024
+      ]
+    },
+    {
+      "parameters": {
+        "path": "marketpulse-health",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "eebcbc42-c1c6-51c6-bb07-8d49a54bea74",
+      "name": "Trigger · MarketPulse Health API",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -2400,
+        1264
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const store = $getWorkflowStaticData('global');\nconst latest = store.marketpulse_latest || null;\nconst errors = Array.isArray(store.marketpulse_errors) ? store.marketpulse_errors : [];\nconst ageHours = latest ? (Date.now() - new Date(latest.generated_at).getTime()) / 3600000 : null;\nconst sourceHealth = latest?.source_health || [];\nconst overall = !latest ? 'unknown' : ageHours > 30 ? 'stale' : sourceHealth.some(source => source.health === 'down') ? 'degraded' : 'healthy';\nreturn [{ json: {\n  success: true,\n  generated_at: new Date().toISOString(),\n  overall_status: overall,\n  latest_snapshot_at: latest?.generated_at || null,\n  snapshot_age_hours: ageHours == null ? null : Number(ageHours.toFixed(2)),\n  source_health: sourceHealth,\n  retained_runs: (store.marketpulse_runs || []).length,\n  historical_products: Object.keys(store.marketpulse_product_state || {}).length,\n  recent_error_count: errors.filter(error => Date.now() - new Date(error.occurred_at).getTime() < 86400000).length,\n  latest_error: errors[0] ? {\n    occurred_at: errors[0].occurred_at,\n    last_node: errors[0].last_node,\n    error_name: errors[0].error_name,\n    error_message: errors[0].error_message\n  } : null\n} }];"
+      },
+      "id": "82ea5721-32bd-52e4-9c2a-0f756f02570f",
+      "name": "Observe · Build Health Status",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2160,
+        1264
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "53350c88-d629-5d94-b0b7-69f0e86742b0",
+      "name": "API · Return Health Status",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -1920,
+        1264
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "marketpulse-failure-intake",
+        "authentication": "headerAuth",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "6674be04-b758-561b-95cb-10b8903adf5e",
+      "name": "Trigger · Failure Event Intake API",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -2400,
+        1504
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const store = $getWorkflowStaticData('global');\nconst payload = $json.body && typeof $json.body === 'object' && !Array.isArray($json.body) ? $json.body : $json;\nconst clip = (value, limit = 500) => String(value ?? '').replace(/[\\u0000-\\u001F]/g, ' ').trim().slice(0, limit);\nstore.marketpulse_errors = Array.isArray(store.marketpulse_errors) ? store.marketpulse_errors : [];\nconst event = {\n  occurred_at: new Date().toISOString(),\n  workflow_ref: clip(payload.workflow?.id || payload.workflow_id, 120) || null,\n  workflow_name: clip(payload.workflow?.name || payload.workflow_name || 'MarketPulse', 160),\n  execution_ref: clip(payload.execution?.id || payload.execution_id, 120) || null,\n  last_node: clip(payload.execution?.lastNodeExecuted || payload.last_node, 160) || null,\n  error_name: clip(payload.execution?.error?.name || payload.error?.name || payload.error_name || 'WorkflowError', 160),\n  error_message: clip(payload.execution?.error?.message || payload.error?.message || payload.error_message || 'Unknown MarketPulse failure', 1000)\n};\nstore.marketpulse_errors.unshift(event);\nstore.marketpulse_errors = store.marketpulse_errors.slice(0, 50);\nreturn [{ json: { success: true, recorded: true, event } }];"
+      },
+      "id": "124961b9-0be8-5644-acb8-d1d5f2cf2d9b",
+      "name": "Observe · Record Failure Event",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2160,
+        1504
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "id": "defbb28d-31be-587f-8f18-969e18593af5",
+      "name": "Collect · Join Request Context + HTTP Response",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        -448,
+        256
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Trigger · Run Demo": {
+      "main": [
+        [
+          {
+            "node": "Context · Manual Demo Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Context · Manual Demo Request": {
+      "main": [
+        [
+          {
+            "node": "Config · Build Runtime Policy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger · Daily Scan at 08:00 MSK": {
+      "main": [
+        [
+          {
+            "node": "Context · Scheduled Scan Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Context · Scheduled Scan Request": {
+      "main": [
+        [
+          {
+            "node": "Config · Build Runtime Policy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger · On-Demand Scan API": {
+      "main": [
+        [
+          {
+            "node": "Context · API Scan Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Context · API Scan Request": {
+      "main": [
+        [
+          {
+            "node": "Config · Build Runtime Policy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config · Build Runtime Policy": {
+      "main": [
+        [
+          {
+            "node": "Config · Validate Scan Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config · Validate Scan Request": {
+      "main": [
+        [
+          {
+            "node": "Route · Demo or Live Collection",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route · Demo or Live Collection": {
+      "main": [
+        [
+          {
+            "node": "Collect · Generate Deterministic Demo Offers",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Collect · Build Query–Marketplace Matrix",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect · Build Query–Marketplace Matrix": {
+      "main": [
+        [
+          {
+            "node": "Collect · Add Request Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect · Add Request Context": {
+      "main": [
+        [
+          {
+            "node": "Collect · Fetch Marketplace Search Results",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Collect · Join Request Context + HTTP Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect · Fetch Marketplace Search Results": {
+      "main": [
+        [
+          {
+            "node": "Collect · Join Request Context + HTTP Response",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Collect · Generate Deterministic Demo Offers": {
+      "main": [
+        [
+          {
+            "node": "Normalize · Wildberries Contract",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Normalize · Ozon Contract",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Normalize · Yandex Market Contract",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect · Parse Live Marketplace Responses": {
+      "main": [
+        [
+          {
+            "node": "Normalize · Wildberries Contract",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Normalize · Ozon Contract",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Normalize · Yandex Market Contract",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize · Wildberries Contract": {
+      "main": [
+        [
+          {
+            "node": "Normalize · Join WB + Ozon Contracts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize · Ozon Contract": {
+      "main": [
+        [
+          {
+            "node": "Normalize · Join WB + Ozon Contracts",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Normalize · Join WB + Ozon Contracts": {
+      "main": [
+        [
+          {
+            "node": "Normalize · Join All Marketplace Contracts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize · Yandex Market Contract": {
+      "main": [
+        [
+          {
+            "node": "Normalize · Join All Marketplace Contracts",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Normalize · Join All Marketplace Contracts": {
+      "main": [
+        [
+          {
+            "node": "Normalize · Build Canonical Product Contract",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize · Build Canonical Product Contract": {
+      "main": [
+        [
+          {
+            "node": "Normalize · Clean Titles and Taxonomy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize · Clean Titles and Taxonomy": {
+      "main": [
+        [
+          {
+            "node": "Quality · Validate Commercial Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Quality · Validate Commercial Fields": {
+      "main": [
+        [
+          {
+            "node": "Quality · Deduplicate Marketplace Offers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Quality · Deduplicate Marketplace Offers": {
+      "main": [
+        [
+          {
+            "node": "Feature · Attach Seven-Day Baseline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Feature · Attach Seven-Day Baseline": {
+      "main": [
+        [
+          {
+            "node": "Feature · Engineer Comparable Signals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Feature · Engineer Comparable Signals": {
+      "main": [
+        [
+          {
+            "node": "Score · Demand and Momentum",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Score · Competitive Pressure",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Score · Unit Economics",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Score · Risk and Compliance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Score · Demand and Momentum": {
+      "main": [
+        [
+          {
+            "node": "Score · Join Demand + Competition",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Score · Competitive Pressure": {
+      "main": [
+        [
+          {
+            "node": "Score · Join Demand + Competition",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Score · Join Demand + Competition": {
+      "main": [
+        [
+          {
+            "node": "Score · Join Economics Signals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Score · Unit Economics": {
+      "main": [
+        [
+          {
+            "node": "Score · Join Economics Signals",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Score · Join Economics Signals": {
+      "main": [
+        [
+          {
+            "node": "Score · Join Risk Signals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Score · Risk and Compliance": {
+      "main": [
+        [
+          {
+            "node": "Score · Join Risk Signals",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Score · Join Risk Signals": {
+      "main": [
+        [
+          {
+            "node": "Score · Compose Explainable Opportunity Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Score · Compose Explainable Opportunity Score": {
+      "main": [
+        [
+          {
+            "node": "Insight · Rank Product Opportunities",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Insight · Build Category Opportunity Map",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Insight · Find Cross-Marketplace Price Gaps",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Insight · Build Diversified Product Set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insight · Rank Product Opportunities": {
+      "main": [
+        [
+          {
+            "node": "Insight · Join Ranking + Category Map",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insight · Build Category Opportunity Map": {
+      "main": [
+        [
+          {
+            "node": "Insight · Join Ranking + Category Map",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Insight · Join Ranking + Category Map": {
+      "main": [
+        [
+          {
+            "node": "Insight · Join Cross-Marketplace Gaps",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insight · Find Cross-Marketplace Price Gaps": {
+      "main": [
+        [
+          {
+            "node": "Insight · Join Cross-Marketplace Gaps",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Insight · Join Cross-Marketplace Gaps": {
+      "main": [
+        [
+          {
+            "node": "Insight · Join Product Set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insight · Build Diversified Product Set": {
+      "main": [
+        [
+          {
+            "node": "Insight · Join Product Set",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Insight · Join Product Set": {
+      "main": [
+        [
+          {
+            "node": "Report · Build Executive Opportunity Radar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Report · Build Executive Opportunity Radar": {
+      "main": [
+        [
+          {
+            "node": "Export · Render Markdown Digest",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Export · Render CSV Opportunities",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Export · Build JSON API Envelope",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Export · Render Markdown Digest": {
+      "main": [
+        [
+          {
+            "node": "Export · Join Markdown + CSV",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Export · Render CSV Opportunities": {
+      "main": [
+        [
+          {
+            "node": "Export · Join Markdown + CSV",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Export · Join Markdown + CSV": {
+      "main": [
+        [
+          {
+            "node": "Export · Join JSON Envelope",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Export · Build JSON API Envelope": {
+      "main": [
+        [
+          {
+            "node": "Export · Join JSON Envelope",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Export · Join JSON Envelope": {
+      "main": [
+        [
+          {
+            "node": "State · Stage Latest Radar Snapshot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "State · Stage Latest Radar Snapshot": {
+      "main": [
+        [
+          {
+            "node": "Route · External Delivery Enabled",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route · External Delivery Enabled": {
+      "main": [
+        [
+          {
+            "node": "Deliver · Send Telegram Digest",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Deliver · Send Slack Summary",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Deliver · Upsert Warehouse Snapshot",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Deliver · Record Delivery Skip",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deliver · Send Telegram Digest": {
+      "main": [
+        [
+          {
+            "node": "Deliver · Join Telegram + Slack Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deliver · Send Slack Summary": {
+      "main": [
+        [
+          {
+            "node": "Deliver · Join Telegram + Slack Results",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Deliver · Join Telegram + Slack Results": {
+      "main": [
+        [
+          {
+            "node": "Deliver · Join Warehouse Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deliver · Upsert Warehouse Snapshot": {
+      "main": [
+        [
+          {
+            "node": "Deliver · Join Warehouse Result",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Deliver · Join Warehouse Result": {
+      "main": [
+        [
+          {
+            "node": "Deliver · Consolidate Delivery Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deliver · Consolidate Delivery Status": {
+      "main": [
+        [
+          {
+            "node": "Route · API Response Required",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deliver · Record Delivery Skip": {
+      "main": [
+        [
+          {
+            "node": "Route · API Response Required",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route · API Response Required": {
+      "main": [
+        [
+          {
+            "node": "API · Return Fresh Opportunity Radar",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Complete · Scheduled or Manual Scan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger · Latest Opportunities API": {
+      "main": [
+        [
+          {
+            "node": "State · Read Latest Radar Snapshot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "State · Read Latest Radar Snapshot": {
+      "main": [
+        [
+          {
+            "node": "API · Return Latest Radar Snapshot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger · MarketPulse Health API": {
+      "main": [
+        [
+          {
+            "node": "Observe · Build Health Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Observe · Build Health Status": {
+      "main": [
+        [
+          {
+            "node": "API · Return Health Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger · Failure Event Intake API": {
+      "main": [
+        [
+          {
+            "node": "Observe · Record Failure Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect · Join Request Context + HTTP Response": {
+      "main": [
+        [
+          {
+            "node": "Collect · Parse Live Marketplace Responses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Europe/Moscow",
+    "saveManualExecutions": true
+  },
+  "tags": []
+}

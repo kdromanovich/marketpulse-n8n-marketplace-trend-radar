@@ -1,5 +1,7 @@
 # MarketPulse — Multi-Marketplace Product Opportunity Radar
 
+[![Workflow checks](https://github.com/kdromanovich/marketpulse-n8n-marketplace-trend-radar/actions/workflows/validate.yml/badge.svg)](https://github.com/kdromanovich/marketpulse-n8n-marketplace-trend-radar/actions/workflows/validate.yml)
+
 [Русская версия](README_RU.md) · [Architecture](docs/ARCHITECTURE.md) · [Setup](docs/SETUP.md) · [Data contracts](docs/DATA_CONTRACTS.md)
 
 An n8n workflow that collects marketplace search results, converts different source formats into one product model, calculates product-opportunity scores, and prepares JSON, CSV, and Markdown reports.
